@@ -1,5 +1,8 @@
 package org.glgnn.user_demo.entity;
+
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -12,7 +15,15 @@ import jakarta.persistence.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_seq"
+    )
+    @SequenceGenerator(
+            name = "user_seq",
+            sequenceName = "user_sequence",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(nullable = false)
@@ -27,8 +38,14 @@ public class User {
     @Column(nullable = false)
     private Boolean status;
 
-    protected User() {
-    }
+    // 🔗 USER → PRODUCTS
+    @OneToMany(
+            mappedBy = "ownerUser",
+            fetch = FetchType.LAZY
+    )
+    private List<Product> products = new ArrayList<>();
+
+    protected User() {}
 
     public User(String name, String email, String tc) {
         this.name = name;
@@ -37,25 +54,15 @@ public class User {
         this.status = true;
     }
 
-    public Long getId() {
-        return id;
-    }
+    // GETTERS
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getTc() { return tc; }
+    public Boolean getStatus() { return status; }
+    public List<Product> getProducts() { return products; }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getTc() {
-        return tc;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
+    // DOMAIN METHODS
     public void changeName(String newName) {
         this.name = newName;
     }
@@ -63,6 +70,4 @@ public class User {
     public void deactivate() {
         this.status = false;
     }
-
 }
-

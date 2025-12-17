@@ -1,4 +1,5 @@
 package org.glgnn.user_demo.controller;
+
 import org.glgnn.user_demo.dto.UserCreateRequest;
 import org.glgnn.user_demo.dto.UserUpdateNameRequest;
 import org.glgnn.user_demo.dto.UserResponse;
@@ -19,7 +20,6 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @PostMapping("/add")
     public ResponseEntity<UserResponse> createUser(
             @RequestBody UserCreateRequest request
@@ -28,24 +28,21 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // READ - by id
-    @GetMapping("/{id}")
+    @GetMapping("/getUser/{id}")
     public ResponseEntity<UserResponse> getUserById(
             @PathVariable Long id
     ) {
-        UserResponse response = userService.getUserById(id);
+        UserResponse response = userService.getActiveUserById(id);
         return ResponseEntity.ok(response);
     }
 
-    // READ - all
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> users = userService.getAllUsers();
+        List<UserResponse> users = userService.getAllActiveUsers();
         return ResponseEntity.ok(users);
     }
 
-    // UPDATE - name only
-    @PutMapping("/{id}/name")
+    @PutMapping("/updateName/{id}")
     public ResponseEntity<UserResponse> updateUserName(
             @PathVariable Long id,
             @RequestBody UserUpdateNameRequest request
@@ -54,8 +51,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // SOFT DELETE
-    @DeleteMapping("/{id}/soft")
+    @DeleteMapping("/soft/{id}")
     public ResponseEntity<Void> softDeleteUser(
             @PathVariable Long id
     ) {
@@ -63,8 +59,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // HARD DELETE
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<Void> hardDeleteUser(
             @PathVariable Long id
     ) {

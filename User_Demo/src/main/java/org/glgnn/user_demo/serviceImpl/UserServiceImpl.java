@@ -1,4 +1,5 @@
 package org.glgnn.user_demo.serviceImpl;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import org.glgnn.user_demo.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -20,9 +22,20 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    /* =========================
+       CREATE
+       ========================= */
+
     @Override
-    @Transactional
     public UserResponse createUser(UserCreateRequest request) {
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        if (userRepository.existsByTc(request.tc())) {
+            throw new RuntimeException("TC already exists");
+        }
 
         User user = new User(
                 request.name(),
@@ -31,56 +44,58 @@ public class UserServiceImpl implements UserService {
         );
 
         User savedUser = userRepository.save(user);
-
         return mapToUserResponse(savedUser);
     }
 
+    /* =========================
+       READ
+       ========================= */
+
     @Override
-    @Transactional
-    public UserResponse getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public UserResponse getActiveUserById(Long userId) {
 
-            return mapToUserResponse(user);
+        User user = userRepository.findByIdAndStatusTrue(userId)
+                .orElseThrow(() -> new RuntimeException("Active user not found"));
 
+        return mapToUserResponse(user);
     }
 
     @Override
-    @Transactional
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll()
+    public List<UserResponse> getAllActiveUsers() {
+
+        return userRepository.findAllByStatusTrue()
                 .stream()
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
     }
 
+    /* =========================
+       UPDATE
+       ========================= */
+
     @Override
-    @Transactional
     public UserResponse updateUserName(Long userId, UserUpdateNameRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User user = userRepository.findByIdAndStatusTrue(userId)
+                .orElseThrow(() -> new RuntimeException("Active user not found"));
 
         user.changeName(request.name());
 
-        User updatedUser = userRepository.save(user);
-
-        return mapToUserResponse(updatedUser);
+        return mapToUserResponse(user);
     }
 
     @Override
-    @Transactional
     public void softDeleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User user = userRepository.findByIdAndStatusTrue(userId)
+                .orElseThrow(() -> new RuntimeException("Active user not found"));
 
         user.deactivate();
-
-        userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public void hardDeleteUser(Long userId) {
+
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("User not found");
         }
@@ -88,7 +103,15 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
+    @Override
+    public User getActiveUserEntity(Long userId) {
+
+        return userRepository.findByIdAndStatusTrue(userId)
+                .orElseThrow(() -> new RuntimeException("Active user not found"));
+    }
+
     private UserResponse mapToUserResponse(User user) {
+
         return new UserResponse(
                 user.getId(),
                 user.getName(),
@@ -96,4 +119,5 @@ public class UserServiceImpl implements UserService {
                 user.getStatus()
         );
     }
+
 }
