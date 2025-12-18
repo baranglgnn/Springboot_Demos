@@ -4,4 +4,3 @@ public record UserUpdateNameRequest(
         String name
 ) {
 }
-

@@ -39,9 +39,7 @@ public class Product {
     @JoinColumn(name = "owner_user_id")
     private User ownerUser;
 
-    protected Product() {
-
-    }
+    protected Product() {}
 
     public Product(String productName, String serialNumber, Double price) {
         this.productName = productName;
@@ -50,29 +48,12 @@ public class Product {
         this.status = true;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public User getOwnerUser() {
-        return ownerUser;
-    }
+    public Long getId() { return id; }
+    public String getProductName() { return productName; }
+    public String getSerialNumber() { return serialNumber; }
+    public Boolean getStatus() { return status; }
+    public Double getPrice() { return price; }
+    public User getOwnerUser() { return ownerUser; }
 
     public void assignToUser(User user) {
         this.ownerUser = user;

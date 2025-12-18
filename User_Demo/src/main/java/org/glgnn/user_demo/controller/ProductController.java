@@ -18,57 +18,51 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
-            @RequestBody ProductCreateRequest request
-    ) {
-        return new ResponseEntity<>(
-                productService.createProduct(request),
-                HttpStatus.CREATED
-        );
+    @PostMapping("/add")
+    public ResponseEntity<ProductResponse> create(@RequestBody ProductCreateRequest request) {
+        return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> get(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+    public ResponseEntity<List<ProductResponse>> getAll() {
         return ResponseEntity.ok(productService.getAllActiveProducts());
     }
 
-    @PutMapping("/price/{id}")
+    @PutMapping("/{id}/price")
     public ResponseEntity<ProductResponse> updatePrice(
             @PathVariable Long id,
-            @RequestBody ProductUpdatePriceRequest request
-    ) {
+            @RequestBody ProductUpdatePriceRequest request) {
         return ResponseEntity.ok(productService.updateProductPrice(id, request));
     }
 
-    @PutMapping("/assign/{id}")
-    public ResponseEntity<ProductResponse> assignProduct(
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<ProductResponse> assign(
             @PathVariable Long id,
-            @RequestBody ProductAssignRequest request
-    ) {
+            @RequestBody ProductAssignRequest request) {
         return ResponseEntity.ok(productService.assignProductToUser(id, request));
     }
 
-    @PutMapping("/unassign/{id}")
-    public ResponseEntity<Void> unassignProduct(@PathVariable Long id) {
+    @PutMapping("/{id}/unassign")
+    public ResponseEntity<Void> unassign(@PathVariable Long id) {
         productService.unassignProduct(id);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/soft/{id}")
+    @DeleteMapping("/{id}/soft")
     public ResponseEntity<Void> softDelete(@PathVariable Long id) {
         productService.softDeleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> hardDelete(@PathVariable Long id) {
         productService.hardDeleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
+

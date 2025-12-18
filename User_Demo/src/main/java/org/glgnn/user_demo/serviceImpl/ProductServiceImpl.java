@@ -28,9 +28,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductCreateRequest request) {
 
-        if (productRepository.existsBySerialNumber(request.serialNumber())) {
-            throw new RuntimeException("Serial number already exists");
-        }
+        if (productRepository.existsBySerialNumber(request.serialNumber()))
+            throw new RuntimeException("Serial number exists");
 
         Product product = new Product(
                 request.productName(),
@@ -38,91 +37,73 @@ public class ProductServiceImpl implements ProductService {
                 request.price()
         );
 
-        return mapToResponse(productRepository.save(product));
+        return map(productRepository.save(product));
     }
 
     @Override
     public ProductResponse getProductById(Long productId) {
-        Product product = productRepository.findByIdAndStatusTrue(productId)
-                .orElseThrow(() -> new RuntimeException("Active product not found"));
-        return mapToResponse(product);
+        return map(findActiveProduct(productId));
     }
 
     @Override
     public List<ProductResponse> getAllActiveProducts() {
         return productRepository.findAllByStatusTrue()
                 .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .map(this::map)
+                .toList();
     }
 
     @Override
     public List<ProductResponse> getActiveProductsByUserId(Long userId) {
 
-        // User aktif mi?
         userService.getActiveUserEntity(userId);
 
         return productRepository.findAllByOwnerUserIdAndStatusTrue(userId)
                 .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .map(this::map)
+                .toList();
     }
 
     @Override
     public ProductResponse updateProductPrice(Long productId, ProductUpdatePriceRequest request) {
-
-        Product product = productRepository.findByIdAndStatusTrue(productId)
-                .orElseThrow(() -> new RuntimeException("Active product not found"));
-
+        Product product = findActiveProduct(productId);
         product.changePrice(request.price());
-        return mapToResponse(product);
+        return map(product);
     }
 
     @Override
     public ProductResponse assignProductToUser(Long productId, ProductAssignRequest request) {
 
-        Product product = productRepository.findByIdAndStatusTrue(productId)
-                .orElseThrow(() -> new RuntimeException("Active product not found"));
+        Product product = findActiveProduct(productId);
 
-        if (product.getOwnerUser() != null) {
+        if (product.getOwnerUser() != null)
             throw new RuntimeException("Product already assigned");
-        }
 
-        User user = userService.getActiveUserEntity(request.userId());
-        product.assignToUser(user);
-
-        return mapToResponse(product);
+        product.assignToUser(userService.getActiveUserEntity(request.userId()));
+        return map(product);
     }
 
     @Override
     public void unassignProduct(Long productId) {
-
-        Product product = productRepository.findByIdAndStatusTrue(productId)
-                .orElseThrow(() -> new RuntimeException("Active product not found"));
-
-        product.unassignUser();
+        findActiveProduct(productId).unassignUser();
     }
 
     @Override
     public void softDeleteProduct(Long productId) {
-
-        Product product = productRepository.findByIdAndStatusTrue(productId)
-                .orElseThrow(() -> new RuntimeException("Active product not found"));
-
-        product.deactivate();
+        findActiveProduct(productId).deactivate();
     }
 
     @Override
     public void hardDeleteProduct(Long productId) {
-
-        if (!productRepository.existsById(productId)) {
-            throw new RuntimeException("Product not found");
-        }
-
         productRepository.deleteById(productId);
     }
 
-    private ProductResponse mapToResponse(Product product) {
+    private Product findActiveProduct(Long id) {
+        return productRepository.findByIdAndStatusTrue(id)
+                .orElseThrow(() -> new RuntimeException("Active product not found"));
+    }
+
+    private ProductResponse map(Product product) {
 
         OwnerInfoResponse owner = null;
 

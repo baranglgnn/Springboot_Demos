@@ -22,96 +22,58 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    /* =========================
-       CREATE
-       ========================= */
-
     @Override
     public UserResponse createUser(UserCreateRequest request) {
 
-        if (userRepository.existsByEmail(request.email())) {
+        if (userRepository.existsByEmail(request.email()))
             throw new RuntimeException("Email already exists");
-        }
 
-        if (userRepository.existsByTc(request.tc())) {
+        if (userRepository.existsByTc(request.tc()))
             throw new RuntimeException("TC already exists");
-        }
 
-        User user = new User(
-                request.name(),
-                request.email(),
-                request.tc()
-        );
-
-        User savedUser = userRepository.save(user);
-        return mapToUserResponse(savedUser);
+        User user = new User(request.name(), request.email(), request.tc());
+        return map(userRepository.save(user));
     }
-
-    /* =========================
-       READ
-       ========================= */
 
     @Override
     public UserResponse getActiveUserById(Long userId) {
-
-        User user = userRepository.findByIdAndStatusTrue(userId)
-                .orElseThrow(() -> new RuntimeException("Active user not found"));
-
-        return mapToUserResponse(user);
+        return map(getActiveUserEntity(userId));
     }
 
     @Override
     public List<UserResponse> getAllActiveUsers() {
-
         return userRepository.findAllByStatusTrue()
                 .stream()
-                .map(this::mapToUserResponse)
-                .collect(Collectors.toList());
+                .map(this::map)
+                .toList();
     }
-
-    /* =========================
-       UPDATE
-       ========================= */
 
     @Override
     public UserResponse updateUserName(Long userId, UserUpdateNameRequest request) {
-
-        User user = userRepository.findByIdAndStatusTrue(userId)
-                .orElseThrow(() -> new RuntimeException("Active user not found"));
-
+        User user = getActiveUserEntity(userId);
         user.changeName(request.name());
-
-        return mapToUserResponse(user);
+        return map(user);
     }
 
     @Override
     public void softDeleteUser(Long userId) {
-
-        User user = userRepository.findByIdAndStatusTrue(userId)
-                .orElseThrow(() -> new RuntimeException("Active user not found"));
-
-        user.deactivate();
+        getActiveUserEntity(userId).deactivate();
     }
 
     @Override
     public void hardDeleteUser(Long userId) {
-
-        if (!userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId))
             throw new RuntimeException("User not found");
-        }
-
         userRepository.deleteById(userId);
     }
 
     @Override
     public User getActiveUserEntity(Long userId) {
-
         return userRepository.findByIdAndStatusTrue(userId)
                 .orElseThrow(() -> new RuntimeException("Active user not found"));
     }
 
-    private UserResponse mapToUserResponse(User user) {
-
+    private UserResponse map(User user) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
@@ -119,5 +81,4 @@ public class UserServiceImpl implements UserService {
                 user.getStatus()
         );
     }
-
 }

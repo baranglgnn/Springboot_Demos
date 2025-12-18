@@ -38,11 +38,7 @@ public class User {
     @Column(nullable = false)
     private Boolean status;
 
-    // 🔗 USER → PRODUCTS
-    @OneToMany(
-            mappedBy = "ownerUser",
-            fetch = FetchType.LAZY
-    )
+    @OneToMany(mappedBy = "ownerUser", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
 
     protected User() {}
@@ -54,7 +50,6 @@ public class User {
         this.status = true;
     }
 
-    // GETTERS
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
@@ -62,7 +57,6 @@ public class User {
     public Boolean getStatus() { return status; }
     public List<Product> getProducts() { return products; }
 
-    // DOMAIN METHODS
     public void changeName(String newName) {
         this.name = newName;
     }

@@ -1,15 +1,13 @@
 package org.glgnn.user_demo.service;
 
-import java.util.List;
-
-import org.glgnn.user_demo.dto.ProductResponse;
 import org.glgnn.user_demo.dto.UserCreateRequest;
 import org.glgnn.user_demo.dto.UserResponse;
 import org.glgnn.user_demo.dto.UserUpdateNameRequest;
 import org.glgnn.user_demo.entity.User;
 
-public interface UserService {
+import java.util.List;
 
+public interface UserService {
 
     UserResponse createUser(UserCreateRequest request);
 
