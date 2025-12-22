@@ -47,10 +47,14 @@ public class Purchase {
     public Purchase(User buyer, Product product) {
         this.buyer = buyer;
         this.product = product;
-        this.buyerEmail = buyer.getEmail();
-        this.productSerialNumber = product.getSerialNumber();
         this.purchaseDate = LocalDateTime.now();
         this.active = true;
+    }
+
+    @PrePersist
+    public void fillImmutableFields() {
+        this.buyerEmail = buyer.getEmail();
+        this.productSerialNumber = product.getSerialNumber();
     }
 
     public Long getId() { return id; }

@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
-    boolean existsByProductIdAndActiveTrue(Long productId);
+    boolean existsByProduct_IdAndActiveTrue(Long productId);
 
     Optional<Purchase> findByIdAndActiveTrue(Long id);
 
-    List<Purchase> findAllByBuyerId(Long userId);
+    List<Purchase> findAllByBuyer_Id(Long userId);
 }

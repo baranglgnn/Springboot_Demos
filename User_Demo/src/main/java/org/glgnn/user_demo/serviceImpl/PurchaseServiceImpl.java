@@ -36,7 +36,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     public PurchaseResponse purchaseProduct(PurchaseCreateRequest request) {
 
-        if (purchaseRepository.existsByProductIdAndActiveTrue(request.productId())) {
+        if (purchaseRepository.existsByProduct_IdAndActiveTrue(request.productId())) {
             throw new RuntimeException("Product already purchased");
         }
 
@@ -67,7 +67,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         userService.getActiveUserEntity(userId);
 
-        return purchaseRepository.findAllByBuyerId(userId)
+        return purchaseRepository.findAllByBuyer_Id(userId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -77,11 +77,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return new PurchaseResponse(
                 purchase.getId(),
-                purchase.getProduct().getProductName(),
-                purchase.getProduct().getSerialNumber(),
-                purchase.getBuyer().getName(),
-                purchase.getBuyer().getEmail(),
+                purchase.getBuyerEmail(),
+                purchase.getProductSerialNumber(),
                 purchase.getPurchaseDate(),
+                purchase.getReturnDate(),
                 purchase.getActive()
         );
     }

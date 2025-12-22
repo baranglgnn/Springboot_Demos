@@ -4,10 +4,9 @@ import java.time.LocalDateTime;
 
 public record PurchaseResponse(
         Long id,
-        String productName,
-        String serialNumber,
-        String buyerName,
         String buyerEmail,
+        String productSerialNumber,
         LocalDateTime purchaseDate,
+        LocalDateTime returnDate,
         Boolean active
 ) {}
