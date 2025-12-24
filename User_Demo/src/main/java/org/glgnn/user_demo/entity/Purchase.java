@@ -42,11 +42,19 @@ public class Purchase {
     @Column(nullable = false)
     private Boolean active;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
+
+    @Column(name = "store_name", nullable = false)
+    private String storeName;
+
     protected Purchase() {}
 
-    public Purchase(User buyer, Product product) {
+    public Purchase(User buyer, Product product, Store store) {
         this.buyer = buyer;
         this.product = product;
+        this.store = store;
         this.purchaseDate = LocalDateTime.now();
         this.active = true;
     }
@@ -55,8 +63,11 @@ public class Purchase {
     public void fillImmutableFields() {
         this.buyerEmail = buyer.getEmail();
         this.productSerialNumber = product.getSerialNumber();
+        this.storeName = store.getName();
     }
 
+    public Store getStore() { return store; }
+    public String getStoreName() { return storeName; }
     public Long getId() { return id; }
     public User getBuyer() { return buyer; }
     public Product getProduct() { return product; }

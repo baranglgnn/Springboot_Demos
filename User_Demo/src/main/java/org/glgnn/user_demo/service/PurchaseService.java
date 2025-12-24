@@ -13,3 +13,6 @@ public interface PurchaseService {
 
     List<PurchaseResponse> getPurchasesByUser(Long userId);
 }
+
+
+

@@ -39,6 +39,10 @@ public class Product {
     @JoinColumn(name = "owner_user_id")
     private User ownerUser;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
     protected Product() {}
 
     public Product(String productName, String serialNumber, Double price) {
@@ -54,6 +58,13 @@ public class Product {
     public Boolean getStatus() { return status; }
     public Double getPrice() { return price; }
     public User getOwnerUser() { return ownerUser; }
+
+    public Store getStore() { return store; }
+
+    public void assignToStore(Store store) {
+        this.store = store;
+    }
+
 
     public void assignToUser(User user) {
         this.ownerUser = user;
